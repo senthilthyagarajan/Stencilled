@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+   .land {
+   stroke: #ff0f00;
+   fill: none;
+   }
+   .state-boundary {
+   fill: none;
+   stroke: #000fff;
+   }
+   .labels {
+   fill: #444;
+   font-family:arial;
+   font-size:0.7em;
+   }
+   .nflteam-arc {
+   fill: none;
+   }
+   .nflteam:hover .nflteam-arc {
+   stroke: #f00;
+   }
+   .nflteam-cell {
+   fill: none;
+   stroke: #000;
+   stroke-opacity: 0.1;
+   pointer-events: all;
+   }
+   text {
+   font: 20px sans-serif;
+   text-anchor: middle;
+   }
+   circle {
+  fill: steelblue;
+  fill-opacity: .8;
+  stroke: #fff;
+}
+</style>
+<body>
+  <svg width="1280" height="800"></svg>
+   <script src="https://d3js.org/d3.v4.min.js" type="text/JavaScript"></script>
+   <script src="http://d3js.org/queue.v1.min.js"></script>
+   <script src="https://d3js.org/topojson.v2.min.js"></script>
+   <script>
+   var svg = d3.select("svg"),
+       width = +svg.attr("width"),
+       height = +svg.attr("height");
+
+   var projection = d3.geoAlbers()
+       .translate([width / 2, height / 2])
+       .scale(1280);
+
+   var radius = d3.scaleSqrt()
+       .domain([0, 100])
+       .range([0, 14]);
+
+   var path = d3.geoPath()
+       .projection(projection)
+       .pointRadius(2.5);
+
+       var circles = svg.append("svg:nflteams")
+    .attr("name", "circles");
+
+   var voronoi = d3.voronoi()
+       .extent([[-1, -1], [width + 1, height + 1]]);
+
+          d3.queue()
+              .defer(d3.json, "http://bl.ocks.org/mbostock/raw/4090846/us.json")
+              .defer(d3.csv, "nflteams.csv", typeTeam)
+              .defer(d3.csv, "nflresults2017.csv", typeSeason)
+              .await(ready);
+
+              function typeTeam(d) {
+              d[0] = +d.longitude;
+              d[1] = +d.latitude;
+              d.arcs = {type: "MultiLineString", coordinates: []};
+              return d;
+              }
+
+  function ready(error, us, nflteams, nflresults2017) {
+          if (error) throw error;
+
+
+          var teambyName = d3.map(nflteams, function(d) { return d.name; });
+
+          nflresults2017.forEach(function(nfl2017) {
+            var source = teambyName.get(nfl2017.origin),
+                target = teambyName.get(nfl2017.destination);
+            source.arcs.coordinates.push([source, target]);
+            target.arcs.coordinates.push([target, source]);
+          });
+
+          nflteams = nflteams
+              .filter(function(d) { return d.arcs.coordinates.length; });
+
+
+
+          svg.append("path")
+              .datum(topojson.feature(us, us.objects.land))
+              .attr("class", "land")
+              .attr("d", path);
+
+          svg.append("path")
+              .datum(topojson.mesh(us, us.objects.states, function(a, b) {return a !== b;}))
+              .attr("class", "state-boundary")
+              .attr("d", path);
+
+          svg.append("path")
+            .datum({type: "MultiPoint", coordinates: nflteams})
+            .attr("class", "nflteam-dots")
+            .attr("d", path);
+
+        var nflteam = svg.selectAll(".nflteam")
+          .data(nflteams)
+          .enter().append("g")
+            .attr("class", "nflteam");
+
+            nflteam.append("title")
+      .text(function(d) { return d.name + "\n" + d.wins + " wins"; });
+
+      nflteam.append("path")
+      .attr("class", "nflteam-arc")
+      .attr("d", function(d) { return path(d.arcs) })
+        .text(function(d){return "test" + d.wins;});
+
+  nflteam.append("path")
+      .data(voronoi.polygons(nflteams.map(projection)))
+      .attr("class", "nflteam-cell")
+      .attr("d", function(d) { return d ? "M" + d.join("L") + "Z" : null; });
+
+      circles.selectAll("circle")
+       .data(nflteams)
+     .enter().append("svg:circle")
+        .attr("r", function(d) { return d.wins*100; });
+
+
+      }
+
+
+
+      function typeSeason(d) {
+      d.result= +d.result
+;
+      return d;
+      }
+   </script>
