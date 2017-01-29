@@ -1,0 +1,303 @@
+<html>
+
+<head>
+
+  <!-- Basic Page Needs
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <meta charset="utf-8">
+  <title>Your page title here :)</title>
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!-- Mobile Specific Metas
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- FONT
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
+
+
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.4.4/d3.min.js" type="text/JavaScript"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-queue/3.0.3/d3-queue.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/2.2.0/topojson.min.js"></script>
+
+  <!-- CSS
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+
+  <link rel="stylesheet" type="text/css" href="../css/normalize.css">
+  <link rel="stylesheet" type="text/css" href="../css/skeleton.css">
+  <link rel="stylesheet" type="text/css" href="../css/bootstrap.css">
+  <link rel="stylesheet" type="text/css" href="../css/custom.css">
+
+  <!-- <link rel="stylesheet" href="/css/normalize.css">
+  <link rel="stylesheet" href="css/skeleton.css">
+    <link rel="stylesheet" href="css/bootstrap.css">
+      <link rel="stylesheet" href="css/custom.css"> -->
+
+  <!-- Favicon
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <link rel="icon" type="image/png" href="images/favicon.png">
+
+
+
+</head>
+
+<meta charset="utf-8">
+<style>
+   .land {
+   stroke: #ff0f00;
+   fill: none;
+   }
+   .state-boundary {
+   fill: none;
+   stroke: #000fff;
+   }
+   .labels {
+   fill: #444;
+   font-family:arial;
+   font-size:0.7em;
+   }
+   .nflteam-arc {
+   fill: none;
+   }
+   .nflteam:hover .nflteam-arc {
+   stroke: #f00;
+   }
+   .nflteam-cell {
+   fill: none;
+   stroke: #000;
+   stroke-opacity: 0.1;
+   pointer-events: all;
+   }
+   text {
+   font: 20px sans-serif;
+   text-anchor: middle;
+   }
+   circle {
+  fill: steelblue;
+  fill-opacity: .8;
+  stroke: #fff;
+}
+</style>
+<body>
+  <!-- Primary Page Layout
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <div class="container">
+    <div class="row">
+      <div id="nav"  class="twelve columns">
+        <nav>
+          <ul>
+            <li><a href="#">Projects</a></li>
+            <li><a href="#">Resume</a></li>
+            <!-- <li><a href="#">Contact</a></li> -->
+          </ul>
+        </nav>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="eleven columns" style="margin-top: 10%">
+        <h4>Hello World !!!</h4>
+
+        <p>Hello World !!! This is my first project using d3js. Being a GIS professional, visualization is always a part of job.
+I always wanted to learn different ways for visualizing data.Let it be a simple plot using R or a choropleth map using
+arcmap or whatever new name they have for it now. </p>
+<p>In this project I am trying to display how the NFL season 2016-17 went about. Ofcourse was surprised to see the cowboys doing so well.
+May be we got our own Tom Brady.I started working with the data grabbed from the NFL site for how the season went by each seasson.
+Below is the location for the each team.
+Now if you hover over each team  you would see which all teams they played and how many wins they had as a label under the hovered team.
+</p>
+
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="eleven columns" style="margin-top: 10%">
+      <!-- start code -->
+
+
+      <!-- end code -->
+      </div>
+    </div>
+  </div>
+<!-- End Document
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <hr>
+  <svg width="1280" height="800"></svg>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.4.4/d3.min.js" type="text/JavaScript"></script>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-queue/3.0.3/d3-queue.min.js"></script>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/2.2.0/topojson.min.js"></script>
+   <script>
+   var svg = d3.select("svg"),
+       width = +svg.attr("width"),
+       height = +svg.attr("height");
+
+   var projection = d3.geoAlbers()
+       .translate([width / 2, height / 2])
+       .scale(1280);
+
+   var radius = d3.scaleSqrt()
+       .domain([0, 100])
+       .range([0, 14]);
+
+   var path = d3.geoPath()
+       .projection(projection)
+       .pointRadius(2.5);
+
+       var circles = svg.append("svg:nflteams")
+    .attr("name", "circles");
+
+   var voronoi = d3.voronoi()
+       .extent([[-1, -1], [width + 1, height + 1]]);
+
+          d3.queue()
+              .defer(d3.json, "us.json")
+              .defer(d3.csv, "nflteams.csv", typeTeam)
+              .defer(d3.csv, "nflresults2017.csv", typeSeason)
+              .await(ready);
+
+              function typeTeam(d) {
+              d[0] = +d.longitude;
+              d[1] = +d.latitude;
+              d.arcs = {type: "MultiLineString", coordinates: []};
+              return d;
+              }
+
+  function ready(error, us, nflteams, nflresults2017) {
+          if (error) throw error;
+
+
+          var teambyName = d3.map(nflteams, function(d) { return d.name; });
+
+          nflresults2017.forEach(function(nfl2017) {
+            var source = teambyName.get(nfl2017.origin),
+                target = teambyName.get(nfl2017.destination);
+            source.arcs.coordinates.push([source, target]);
+            target.arcs.coordinates.push([target, source]);
+          });
+
+          nflteams = nflteams
+              .filter(function(d) { return d.arcs.coordinates.length; });
+
+
+
+          svg.append("path")
+              .datum(topojson.feature(us, us.objects.land))
+              .attr("class", "land")
+              .attr("d", path);
+
+          svg.append("path")
+              .datum(topojson.mesh(us, us.objects.states, function(a, b) {return a !== b;}))
+              .attr("class", "state-boundary")
+              .attr("d", path);
+
+          svg.append("path")
+            .datum({type: "MultiPoint", coordinates: nflteams})
+            .attr("class", "nflteam-dots")
+            .attr("d", path);
+
+        var nflteam = svg.selectAll(".nflteam")
+          .data(nflteams)
+          .enter().append("g")
+            .attr("class", "nflteam");
+
+            nflteam.append("title")
+      .text(function(d) { return d.name + "\n" + d.wins + " wins"; });
+
+      nflteam.append("path")
+      .attr("class", "nflteam-arc")
+      .attr("d", function(d) { return path(d.arcs) })
+        .text(function(d){return "test" + d.wins;});
+
+  nflteam.append("path")
+      .data(voronoi.polygons(nflteams.map(projection)))
+      .attr("class", "nflteam-cell")
+      .attr("d", function(d) { return d ? "M" + d.join("L") + "Z" : null; });
+
+      circles.selectAll("circle")
+       .data(nflteams)
+     .enter().append("svg:circle")
+        .attr("r", function(d) { return d.wins*100; });
+
+
+      }
+
+
+
+      function typeSeason(d) {
+      d.result= +d.result
+;
+      return d;
+      }
+   </script>
+<hr>
+  <div class="eleven columns">
+<p>Below is the data for the team location as well as their results from week 1 to week 17</p>
+
+<pre><code>
+  name,latitude,longitude,wins
+  CHI,41.53,-87.38,2
+  GBP,44.3,-88.01,9
+  ARZ,33.27,-112.05,5
+  ATL,33.45,-84.23,13
+  BAL,39.17,-76.37,8
+  BUF,42.54,-78.53,6
+  CAR,35.14,-80.5,5
+  CIN,39.06,-84.31,8
+  CLE,41.3,-81.41,1
+  DAL,32.47,-96.48,13
+  DEN,39.43,-105.01,8
+  DET,42.2,-83.03,9
+  HOU,29.46,-95.22,9
+  IND,39.46,-86.09,8
+  JAC,30.2,-81.4,5
+  KCC,39.06,-94.37,12
+  MIA,25.46,-80.12,9
+  MIN,44.59,-93.13,9
+  NEP,42.21,-71.04,12
+  NOS,29.58,-90.07,6
+  NYG,40.43,-74.01,11
+  NYJ,40.43,-74.01,4
+  OAK,37.47,-122.13,11
+  PHI,39.57,-75.07,8
+  PIT,40.26,-80,9
+  RAMS,38.38,-90.11,3
+  SDC,32.43,-118.09,8
+  SFO,37.48,-122.24,4
+  SEA,47.36,-122.2,11
+  TBB,27.57,-82.27,8
+  TEN,36.09,-86.48,7
+  WAS,38.54,-77.01,9
+</pre></code>
+
+
+<p> Week 1 Results</p>
+<pre><code>
+  origin,destination,fromscore,toscore,difference,result,week
+  RAMS,SFO,0,28,-28,L,1
+  PIT,WAS,38,16,22,W,1
+  NEP,ARZ,23,21,2,W,1
+  DET,IND,39,35,4,W,1
+  NYG,DAL,20,19,1,W,1
+  MIA,SEA,10,12,-2,L,1
+  BUF,BAL,7,13,-6,L,1
+  CHI,HOU,14,23,-9,L,1
+  CIN,NYJ,23,22,1,W,1
+  CLE,PHI,10,29,-19,L,1
+  GBP,JAC,27,23,4,W,1
+  MIN,TEN,25,16,9,W,1
+  OAK,NOS,35,34,1,W,1
+  SDC,KCC,27,33,-6,L,1
+  TBB,ATL,31,24,7,W,1
+  CAR,DEN,,21,-21,L,1
+
+</pre></code>
+
+<p>As an improvement I would try and style the lines in blue(win) and red(loss).</p>
+
+
+  </div>
+
+</html>

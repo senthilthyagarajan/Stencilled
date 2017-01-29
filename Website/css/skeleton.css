@@ -1,4 +1,4 @@
-/*
+﻿/*
 * Skeleton V2.0.4
 * Copyright 2014, Dave Gamache
 * www.getskeleton.com
@@ -28,6 +28,7 @@
 
 /* Grid
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
+
 .container {
   position: relative;
   width: 100%;
@@ -40,7 +41,8 @@
   width: 100%;
   float: left;
   box-sizing: border-box; }
-
+  
+  
 /* For devices larger than 400px */
 @media (min-width: 400px) {
   .container {
