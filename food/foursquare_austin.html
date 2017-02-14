@@ -70,15 +70,15 @@ text-anchor: middle;
       .padding(1.5);
 
   d3.csv("austin_fsq.csv", function(d) {
-    d.id = +d.id;
-    if (d.id) return d;
+    d.sno = +d.sno;
+    if (d.sno && d.rating>=9&&d.value < 500) return d;
   }, function(error, classes) {
     if (error) throw error;
 
     var root = d3.hierarchy({children: classes})
-        .sum(function(d) { return d.checkins; })
+        .sum(function(d) { return d.value; })
         .each(function(d) {
-          if (id = d.data.checkins) {
+          if (id = d.data.id) {
             var id, i = id.lastIndexOf(".");
             d.id = id;
             d.package = id.slice(0, i);
@@ -112,7 +112,7 @@ text-anchor: middle;
         .text(function(d) { return d; });
 
     node.append("title")
-    .text(function(d) { return d.name + "\n" + format(d.checkins); });
+    .text(function(d) { return d.data.id + "\n" + format(d.value); });
   });
 
    </script>
