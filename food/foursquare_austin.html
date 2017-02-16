@@ -71,7 +71,7 @@ text-anchor: middle;
 
   d3.csv("austin_fsq.csv", function(d) {
     d.sno = +d.sno;
-    if (d.sno && d.rating>=9&&d.value < 500) return d;
+    if (d.sno && d.rating>=9&&d.value <= 5000) return d;
   }, function(error, classes) {
     if (error) throw error;
 
