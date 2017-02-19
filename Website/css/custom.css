@@ -20,5 +20,16 @@ body {
 
     font-size: 20px;
     text-align: justify;
-    
+
 }
+.nav-tabs {
+    height: 2.5em;
+}
+
+.navbar {
+    height: 2.5em;
+  }
+
+	body {
+	    font-family: Lato;
+	    	}
