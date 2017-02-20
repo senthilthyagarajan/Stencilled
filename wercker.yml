@@ -1,0 +1,8 @@
+box: wercker/default
+
+deploy:
+    steps:
+        - s3sync:
+            key-id: AKIAJUGMOHESIGRHH4IQ
+            key-secret: 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
+            bucket-url: www.stencilled.me
