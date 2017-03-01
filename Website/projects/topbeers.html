@@ -1,0 +1,247 @@
+<html>
+   <head>
+      <!-- Basic Page Needs
+         –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+      <meta charset="utf-8">
+      <title>Stencilled</title>
+      <meta name="description" content="">
+      <meta name="Senthil Thyagarajan" content="">
+      <!-- Mobile Specific Metas
+         –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <!-- FONT
+         –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+      <!-- <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css"> -->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.4.4/d3.min.js" type="text/JavaScript"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-queue/3.0.3/d3-queue.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/2.2.0/topojson.min.js"></script>
+      <!-- JS–––––––––––––––––––––––––––––––––––––––––––––––––– -->
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+      <!-- CSS
+         –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+      <link rel="stylesheet" type="text/css" href="../css/normalize.css">
+      <link rel="stylesheet" type="text/css" href="../css/skeleton.css">
+      <link rel="stylesheet" type="text/css" href="../css/bootstrap.css">
+      <link rel="stylesheet" type="text/css" href="../css/custom.css">
+      <!-- <link rel="stylesheet" href="/css/normalize.css">
+         <link rel="stylesheet" href="css/skeleton.css">
+           <link rel="stylesheet" href="css/bootstrap.css">
+             <link rel="stylesheet" href="css/custom.css"> -->
+
+             <style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+      <!-- Favicon
+         –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+      <link rel="icon" type="image/png" href="/images/favicon.png">
+   </head>
+   <meta charset="utf-8">
+   <style>
+      text {
+      font: 10px sans-serif;
+      text-anchor: middle;
+      }
+   </style>
+
+   <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-91161205-1', 'auto');
+      ga('send', 'pageview');
+
+   </script>
+   <body>
+      <!-- Primary Page Layout
+         –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+      <div class="container">
+         <div class="row">
+           <nav class="navbar navbar-inverse navbar-static-top" role="navigation">
+                <div class="container">
+                    <div class="navbar-header">
+                 <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                   <span class="sr-only">Toggle navigation</span>
+                   <span class="icon-bar"></span>
+                   <span class="icon-bar"></span>
+                   <span class="icon-bar"></span>
+                 </button>
+               </div>
+
+               <!-- Collect the nav links, forms, and other content for toggling -->
+               <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                  <ul class="nav navbar-nav">
+                    <li class="nav-item">
+                       <a class="nav-link active" href="../index.html">Home</a>
+                    </li>
+                     <li class="nav-item dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Projects <span class="caret"></span></a>
+                        <div class="dropdown-menu">
+                           <a class="dropdown-item" href="/projects/nfl_d3js.html">NFL Season 2016-17</a>
+                           <div class="dropdown-divider"></div>
+                           <a class="dropdown-item" href="/projects/foursquare.html">Where do people eat in Austin ??</a>
+                            <div class="dropdown-divider"></div>
+                          <a class="dropdown-item" href="/projects/topbeers.html">Top Breweries 2016</a>
+                           <!-- <a class="dropdown-item" href="#">Something else here</a> -->
+                        </div>
+                     </li>
+                     <li><a href="../resume.html">Resume</a></li>
+                  </ul>
+                </div>
+              </nav>
+         </div>
+         <div class="row">
+            <div class="eleven columns" >
+              <h2>Top Breweries 2016</h2>
+
+              <p> After completing my previous post on food I wanted to work on something which I have started to explore recently,craft beer.
+                 A friend of mine introduced me to a beer club membership prior to which I never knew anything beyond the Corona's .
+                 Then began the collection and here it is, what  have so far. </p>
+<br>
+                   <img src="/images/beercaps.jpg" class="img-responsive" alt="Beer Caps">
+<br>
+                <p> So when I started searching for the data google lead me to <a href="https://www.beeradvocate.com/lists/top/">Beer Advocate.</a> Below is how the raw html table from the website looked like.<p>
+<br>
+                  <img src="/images/rawdata.PNG" class="img-responsive" alt="Raw Data">
+<br>
+              <p> I have used R to scrape the table from the website using R. The library I am using here to scrape is <i>Rvest</i>. Below is the code on how to get the data.</p>
+<br>
+              <pre class="r hljs">
+                  <code class="r">
+                    library("rvest")
+
+                    # Enter the url below
+                    url <- "https://www.beeradvocate.com/lists/top/"
+
+                      beer <- url %>%
+                      html() %>%
+
+                      ## to get xpath for a table ,right click on the table,inspect,
+                      ## go to the table tag ,right click again and go to copy xpath .. phew ...
+                      ## not clear click here for <a href="http://www.wikihow.com/Find-XPath-Using-Firebug">more details</a>
+
+                      html_nodes(xpath = '//*[@id="extendedInfo"]/a[1]') %>%
+                      html_table()
+                      beer <- beer[[1]]
+
+                      head(beer)
+                      write.table(
+                        beer,
+                        file = "topus250.csv",
+                        quote = TRUE,
+                        sep = ",",
+                        row.names = FALSE
+                    )
+
+
+
+              </code>
+              </pre>
+<br>
+              <p>Now that I got the scraped data and  address parameter as the name of the brewing company , it looks something like this
+              </p>
+<br>
+             <img src="/images/address.PNG" class="img-responsive" alt="Address from R">
+<br>
+              <p>The next step here is to get the address geocoded which would help me plot this on a map . For this I have used the library ggmap.
+              </p>
+<br>
+<div >
+              <pre class ="r hljs">
+                <code class="r">
+                  library(ggmap)
+
+                 # Read in the CSV data and store it in a variable
+                  origAddress <- read.csv("topus250.csv", stringsAsFactors = FALSE)
+
+                  # Initialize the data frame
+                  geocoded <- data.frame(stringsAsFactors = FALSE)
+
+                  # Loop through the addresses to get the latitude and longitude of each address
+                  # and add it to the origAddress data frame in new columns lat and lon
+
+                  for(i in 1:nrow(origAddress))
+                  {
+                    # Print("Working...")
+                    result <- geocode(origAddress$Address[i], output = "latlona", source = "google")
+                    origAddress$lon[i] <- as.numeric(result[1])
+                    origAddress$lat[i] <- as.numeric(result[2])
+                    origAddress$geoAddress[i] <- as.character(result[3])
+                    origAddress$state[i] <- as.character(result[3])
+                  }
+
+                  # Save the output as csv to the working directory
+                  write.csv(result, file = geocoded.csv)
+
+
+                </code>
+              </pre>
+            </div>
+<br>
+            <p> Now I got the data cleaned, gecoded and ready to plot it on the map. Another task ...another library. Here I have used  the leaflet library
+              to add the basemap,plot the points , add clusters and markers to it. All it took was a couple of lines in R  !! As a continuation to this project
+            </p>
+<br>
+<div >
+  <pre class="r hljs"><code class="r">
+
+    library(leaflet)
+
+    library(dplyr)
+
+    lf <-
+      read.csv("beer_lat_long.csv", stringsAsFactors = FALSE) # Brings in the file 'ctlist.csv'
+
+    map <-
+      leaflet(lf) %>% addTiles('http://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png',
+                               attribution = 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>')
+
+    map %>% setView(-95.712891, 37.09024, zoom = 5)
+
+    #add cluster
+
+    map %>% addMarkers(
+      popup = paste(
+        "Brewer:",
+        lf$company,
+        "Beer Name:",
+        lf$name,
+        "Rank:",
+        lf$rank
+      ),
+      clusterOptions = markerClusterOptions()
+    )
+
+</code></pre></div>
+<br>
+
+            <!-- map code start -->
+            <div class='myIframe' >
+      <iframe width="720" height="600" src="https://s3.amazonaws.com/www.stencilled.me/projects/leaflethtml.html"></iframe>
+            </div>
+            <br>
+<p>Sadly we dont  see many breweries in the top list from Texas, but then that gives me more the reasons to travel and visit many breweries.
+As I was doing this project I did realize that when I want to show the leaflet map using R in an html page this converts all the data loaded
+and that makes the html file heavy to load. So going on next I would  to try  do some more advanced visualization and representation of the
+same data using leaflet library and html.</p>
+<p>I am still working on building this website and till then I would appreciate if you could
+  leave me any feedback at <a href="https://twitter.com/intent/tweet?screen_name=TheRascala" class="twitter-mention-button" data-related="therascala"> @therascala</a>.</p>
+<br>
+         </div>
+      </div>
+      <!-- End Document-->
+
+  <!-- Footer -->
+      <hr>
+      <div class="eleven columns"style="text-align: center">
+      <footer>
+              <a>&copy; 2017 Senthil Thyagarajan.</a>
+      </footer>
+    </div>
+  </body>
+</html>
